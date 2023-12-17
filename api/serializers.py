@@ -22,7 +22,7 @@ class FileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Chat
-        fields = ('message','date_time','user_name','chat_id','imgfile','file_name')
+        fields = ('message','date_time','user_type','chat_id','imgfile','file_name')
         
     def get_image_url(self, obj):
         if obj.file:  

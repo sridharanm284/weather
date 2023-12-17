@@ -68,6 +68,22 @@ class Forecast:
         for data in self.datas: self.dutylisttaskid.add(data['dutylisttaskid'])
         self.dutylisttaskid = max(self.dutylisttaskid)
         return self.datas
+
+    def ReadDiscussion(self):
+        print(self.forecast_id)
+        self.connection = psycopg2.connect(**DBConnection.FETCHDB)
+        self.cursor = self.connection.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        self.cursor.execute(f'SELECT discussion_id,synopsis,warning,advisory,notes from tbl_discussion WHERE forecast_id={self.forecast_id} order by discussion_id desc LIMIT 1')
+        datas = self.cursor.fetchone()
+        print("Discussion ",datas.get('discussion_id'))
+        discussion_id = datas.get('discussion_id')
+        self.cursor.execute(f'SELECT discussion_id,other_text_title,other_text_description from tbl_discussion_detail WHERE discussion_id={datas.get("discussion_id")} LIMIT 1')
+        discussion_datas = self.cursor.fetchone()
+        print("Discussion",datas)
+        self.connection.close()
+        return {'discussion':datas,'discussion_detail':discussion_datas}
+
+    
     def ScrapeDatas(self):
         last_date: str = None
         day_data: list = []
@@ -186,7 +202,7 @@ class Observation:
     def SendMail(self):
         try:
             sender_email = "sridharandeveloper06@outlook.com"
-            password = "Project@24"
+            password = "Project@1234"
             message = MIMEMultipart()
             message["Subject"] = "Observation Form Submission"
             message["From"] = sender_email

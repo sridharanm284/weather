@@ -23,6 +23,7 @@ urlpatterns = [
     path('typhoon/<str:forecast_id>/',typhoonDatas,name="typhoon"),
     path('stormdatas/',stormDatas,name="stormdatas"),
     path('lastedited/<str:forecast_id>/',getLastEdited,name="lastedited"),  
+    path('user/update/<str:id>', updateUsers, name='updateusers'),
     path('getplaceholder/<str:forecast_id>', getPlaceHolder, name="getPlaceHolder"),
-    path('send-email/', send_email, name='send-email'),
+    # path('gettablediscussion/', getTableDiscussion, name="getTableDiscussion")
 ]

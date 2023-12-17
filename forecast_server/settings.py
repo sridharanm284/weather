@@ -12,7 +12,8 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import os
-
+from celery.schedules import crontab
+    
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -33,6 +34,9 @@ CORS_ORIGIN_ALLOW_ALL = True
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
+    'chat',
+    'channels',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -85,7 +89,7 @@ REST_FRAMEWORK = {
 
 CHANNEL_LAYERS = {
     'default': {
-        'BACKEND': 'channels.layers.InMemoryChannelLayer', # Use an in-memory layer for development
+        'BACKEND': 'channels.layers.InMemoryChannelLayer', 
         'ROUTING': 'your_project.routing.application',
     },
 }
@@ -178,5 +182,24 @@ CORS_ALLOW_HEADERS = "*"
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-ASGI_APPLICATION = "forecast_server.routing.application"
+ASGI_APPLICATION = "forecast_server.asgi.application"
 
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
+}
+
+CELERY_BROKER_URL = 'redis://localhost:6379/0'  # Use Redis as the message broker
+CELERY_TIMEZONE = 'UTC'
+
+# Configure Celery Beat
+CELERY_BEAT_SCHEDULE = {
+    'send-emails-periodically': {
+        'task': 'subscription.tasks.send_emails',  # Task that sends emails
+        'schedule': crontab(minute=0, hour=0),  # Run daily at midnight
+    },
+}

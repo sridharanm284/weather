@@ -1,6 +1,6 @@
 from django.db import models
 from django.db.models.base import ModelBase
-
+import os
 class ForecastID(models.Model):
     forecast_id = models.IntegerField()
 
@@ -49,12 +49,19 @@ class Tokens(models.Model):
     user_name=models.CharField(max_length=100)
     token=models.CharField(max_length=200)
 
+
+def upload_to(instance, filename):
+    # 'instance' is the model instance (Chat in this case)
+    # 'filename' is the original filename of the uploaded file
+    return os.path.join('uploads', filename)
+
 class Chat(models.Model):
     message=models.TextField()
     date_time=models.DateTimeField(auto_now_add=True)
-    file = models.FileField(upload_to='uploads/',blank=True)
+    file = models.FileField(upload_to=upload_to,blank=True)
     chat_id=models.CharField(max_length=100)
-    user_name=models.CharField(max_length=100,default="user")
+    user_type=models.CharField(max_length=100,default="user")
+    
     
 class ChatRooms(models.Model):
     user_id=models.IntegerField()
